@@ -1,0 +1,34 @@
+{{
+  condition ||
+    (value !== null &&
+      value !== undefined &&
+      (condition === null || condition === undefined))
+}}
+
+<ng-container #filterDiv>
+  <div
+    *ngIf="
+      condition ||
+        (value !== null &&
+          value !== undefined &&
+          (condition === null || condition === undefined));
+      then display;
+      else load
+    "
+  ></div>
+
+  <ng-template #display>
+    <p>{{ value }}</p>
+  </ng-template>
+
+  <ng-template #load>
+    <div
+      #animation
+      class="animation"
+      [style.width]="options?.width"
+      [style.height]="options?.height"
+    >
+      &nbsp;
+    </div>
+  </ng-template>
+</ng-container>
