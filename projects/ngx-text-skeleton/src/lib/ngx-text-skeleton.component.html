@@ -1,9 +1,9 @@
-{{
+<!-- {{
   condition ||
     (value !== null &&
       value !== undefined &&
       (condition === null || condition === undefined))
-}}
+}} -->
 
 <ng-container #filterDiv>
   <div
@@ -18,7 +18,20 @@
   ></div>
 
   <ng-template #display>
-    <p>{{ value }}</p>
+    <ng-container [ngSwitch]="options?.typeBalise">
+      <p *ngSwitchCase="'p'">{{ value }}</p>
+      <span *ngSwitchCase="'span'">{{ value }}</span>
+      <div *ngSwitchCase="'div'">{{ value }}</div>
+
+      <h1 *ngSwitchCase="'h1'">{{ value }}</h1>
+      <h2 *ngSwitchCase="'h2'">{{ value }}</h2>
+      <h3 *ngSwitchCase="'h3'">{{ value }}</h3>
+      <h4 *ngSwitchCase="'h4'">{{ value }}</h4>
+      <h5 *ngSwitchCase="'h5'">{{ value }}</h5>
+      <h6 *ngSwitchCase="'h6'">{{ value }}</h6>
+
+      <p *ngSwitchDefault>{{ value }}</p>
+    </ng-container>
   </ng-template>
 
   <ng-template #load>

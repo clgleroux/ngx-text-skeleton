@@ -1,8 +1,9 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   ElementRef,
+  Inject,
   Input,
   Renderer2,
   SimpleChanges,
@@ -33,7 +34,11 @@ export class NgxTextSkeletonComponent implements AfterViewInit {
   @ViewChild('filterDiv') filterDivRef!: ElementRef;
   @ViewChildren('animation') animation!: any;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(
+    private elementRef: ElementRef,
+    private renderer: Renderer2,
+    @Inject(DOCUMENT) private document: Document
+  ) {}
 
   ngAfterViewInit(): void {
     this.updateStyleAnimation(true);
@@ -55,20 +60,54 @@ export class NgxTextSkeletonComponent implements AfterViewInit {
         : window.getComputedStyle(this.filterDivRef.nativeElement.parentNode)
             .color;
 
-    if (init && parentColor && this.animation.first)
-      this.renderer.setStyle(
-        this.animation.first.nativeElement,
-        'background-color',
-        parentColor
-      );
+    const child = this.document.createElement(this.options?.typeBalise ?? 'p');
+    child.textContent = '&nbsp;';
 
+    child.style.visibility = 'hidden';
+    child.style.position = 'absolute';
+
+    child.classList.add('simulate-height');
+    this.renderer.appendChild(this.elementRef.nativeElement, child);
+
+    const simulateHeightElement = document
+      .getElementsByClassName('simulate-height')
+      .item(0) as HTMLElement;
+
+    const simulateHeight = simulateHeightElement.offsetHeight;
+
+    this.renderer.removeChild(this.elementRef.nativeElement, child);
+
+    if (init && (parentColor || simulateHeight) && this.animation.first) {
+      if (parentColor)
+        this.renderer.setStyle(
+          this.animation.first.nativeElement,
+          'background-color',
+          parentColor
+        );
+
+      if (simulateHeight) {
+        this.renderer.setStyle(
+          this.animation.first.nativeElement,
+          'height',
+          `${simulateHeight}px`
+        );
+      }
+    }
+
+    // Wait animation create in dom
     this.animation.changes.subscribe((res: any) => {
-      console.log(res);
       if (parentColor && this.animation.first)
         this.renderer.setStyle(
           this.animation.first.nativeElement,
           'background-color',
           parentColor
+        );
+
+      if (simulateHeight && this.animation.first)
+        this.renderer.setStyle(
+          this.animation.first.nativeElement,
+          'height',
+          `${simulateHeight}px`
         );
     });
   }
